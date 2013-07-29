@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Pizza Details</title>
+</head>
+<body>
+	<h1>Pizza:</h1>
+	<b>Size:</b>
+	{{ pizza.get_size() }}
+	<br>
+	<b>Topping(s):</b>
+	<br>
+    <ul>
+    {% for topping in pizza.get_toppings() -%}
+    	<li>{{ topping }}</li>
+    {% endfor -%}
+    </ul>
+</body>
+</html>
+

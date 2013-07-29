@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Pizza Details</title>
+</head>
+<body>
+	<h1>Pizza:</h1>
+	<b>Size:</b>
+	<tal:block tal:content="python:pizza.get_size()"></tal:block>
+	<br>
+	<b>Topping(s):</b>
+	<br>
+    <ul>
+	<li tal:repeat="item python:pizza.get_toppings()"><tal:block tal:content="item"></tal:block></li>
+	</ul>
+</body>
+</html>

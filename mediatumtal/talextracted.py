@@ -2406,8 +2406,7 @@ class AthanaTALEngine:
         return "$%s$" % expr
 
     def uncompile(self, expression):
-        assert (expression.startswith("$") and expression.endswith("$"),
-            expression)
+        assert expression.startswith("$") and expression.endswith("$"), expression
         return expression[1:-1]
 
     def beginScope(self):
@@ -2426,8 +2425,7 @@ class AthanaTALEngine:
         self.globals[name] = value
 
     def evaluate(self, expression):
-        assert (expression.startswith("$") and expression.endswith("$"),
-            expression)
+        assert expression.startswith("$") and expression.endswith("$"), expression
         expression = expression[1:-1]
         m = name_match(expression)
         if m:
@@ -2500,8 +2498,7 @@ class AthanaTALEngine:
         return self.evaluate(expr)
 
     def evaluateMacro(self, macroName):
-        assert (macroName.startswith("$") and macroName.endswith("$"),
-            macroName)
+        assert macroName.startswith("$") and macroName.endswith("$"), macroName
         macroName = macroName[1:-1]
         file, localName = self.findMacroFile(macroName)
         if not file:
@@ -2741,7 +2738,8 @@ def join_paths(p1,p2):
         else:
             return p1 + "/" + p2
 
-#l 5941
+#l 5940
+translators = []
 macroresolvers = []
 
 
@@ -2768,3 +2766,13 @@ def setBase(base):
     global GLOBAL_ROOT_DIR
     GLOBAL_ROOT_DIR = qualify_path(base)
    
+
+#l 6831
+def addMacroResolver(m):
+    global macroresolvers
+    macroresolvers += [m]
+
+def addTranslator(m):
+    global translators
+    translators += [m]
+

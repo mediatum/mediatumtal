@@ -1,0 +1,5 @@
+<metal:block metal:define-macro="pizza_toppings" xmlns:z="http://xml.zope.org/namespaces/tal">
+	<div z:repeat="item python:pizza.get_toppings()">
+		<li z:replace="item">1</li>
+	</div>
+</metal:block>
