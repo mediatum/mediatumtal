@@ -5,6 +5,8 @@ Created on 26.07.2013
 '''
 from __future__ import division, absolute_import
 import logging
+import os.path
+import sys
 
 from flask import Flask, render_template
 # some debugging and profiling stuff
@@ -16,9 +18,10 @@ try:
     from flask_debugtoolbar import DebugToolbarExtension
 except:
     DebugToolbarExtension = None
-    
+
+sys.path.append(".")    
+
 from mediatumtal.tal import getTAL
-from mediatumtal.test.test_tal import pizza
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -33,7 +36,8 @@ app.config['SECRET_KEY'] = 'TODU9H7xmFHiLRpOforS/gREA+suKW+TEDxNnJ/0C'
 
 if Dozer:
     wsgi_app = Profiler(app, profile_path="/tmp")
-else: wgsi_app = app
+else: 
+    wsgi_app = app
 
 
 class Pizza():
