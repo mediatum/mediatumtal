@@ -4,6 +4,12 @@ talextracted.py
 Created on 03.07.2013
 @author: stenzel
 '''
+import logging
+
+# logging.basicConfig()
+logg = logging.getLogger("mediatumtal")
+
+GLOBAL_ROOT_DIR = ""
 
 class TALError(Exception):
 
@@ -937,7 +943,7 @@ class TALGenerator:
 
     def emitRepeat(self, arg):
 
-        
+
         m = re.match("(?s)\s*(%s)\s+(.*)\Z" % NAME_RE, arg)
         if not m:
             raise TALError("invalid repeat syntax: " + `arg`,
@@ -1363,7 +1369,7 @@ class TALGenerator:
             assert (varname[1]
                     in [I18N_REPLACE, I18N_CONTENT, I18N_EXPRESSION])
             self.emitI18nVariable(varname)
-        if msgid is not None: 
+        if msgid is not None:
             if varname and (varname[1] <> I18N_CONTENT):
                 self.emitTranslation(msgid, i18ndata)
         if repeat:
@@ -1403,7 +1409,7 @@ def _parseI18nAttributes(i18nattrs, attrlist, repldict, position,
     d = {}
     if ';' in i18nattrs:
         i18nattrlist = i18nattrs.split(';')
-        i18nattrlist = [attr.strip().split() 
+        i18nattrlist = [attr.strip().split()
                         for attr in i18nattrlist if attr.strip()]
         for parts in i18nattrlist:
             if len(parts) > 2:
@@ -1424,7 +1430,7 @@ def _parseI18nAttributes(i18nattrs, attrlist, repldict, position,
             if (not i18nattrlist[1] in staticattrs) and (
                 not i18nattrlist[1] in repldict):
                 attr, msgid = i18nattrlist
-                addAttribute(d, attr, msgid, position, xml)    
+                addAttribute(d, attr, msgid, position, xml)
             else:
                 import warnings
                 warnings.warn(I18N_ATTRIBUTES_WARNING
@@ -1432,15 +1438,15 @@ def _parseI18nAttributes(i18nattrs, attrlist, repldict, position,
                 , DeprecationWarning)
                 msgid = None
                 for attr in i18nattrlist:
-                    addAttribute(d, attr, msgid, position, xml)    
-        else:    
+                    addAttribute(d, attr, msgid, position, xml)
+        else:
             import warnings
             warnings.warn(I18N_ATTRIBUTES_WARNING
             % (source_file, str(position), i18nattrs)
             , DeprecationWarning)
             msgid = None
             for attr in i18nattrlist:
-                addAttribute(d, attr, msgid, position, xml)    
+                addAttribute(d, attr, msgid, position, xml)
     return d
 
 I18N_ATTRIBUTES_WARNING = (
@@ -1927,7 +1933,7 @@ class TALInterpreter:
         else:
             self.col = len(s) - (i + 1)
     bytecode_handlers["insertText"] = do_insertText
-    
+
     def do_insertRawText_tal(self, stuff):
         text = self.engine.evaluateText(stuff[0])
         if text is None:
@@ -2376,7 +2382,7 @@ class AthanaTALEngine:
 
     def compilefile(self, file, mode=None):
         assert mode in ("html", "xml", None)
-        #file =  join_paths(GLOBAL_ROOT_DIR,join_paths(self.webcontext.root, file))
+#         file =  join_paths(GLOBAL_ROOT_DIR,join_paths(self.webcontext.root, file))
         if mode is None:
             ext = os.path.splitext(file)[1]
             if ext.lower() in (".html", ".htm"):
@@ -2444,10 +2450,8 @@ class AthanaTALEngine:
         if type == "python":
             try:
                 return eval(expr, self.globals, self.locals)
-            except:
-                # XXX: logging must be changed
-#                 lgerr.log("Error in python expression:" + str(sys.exc_info()[0]) + " " + str(sys.exc_info()[1]))
-#                 traceback.print_tb(sys.exc_info()[2],None,lgerr)
+            except Exception as e:
+                logg.error("error!", exc_info=1)
                 raise TALESError("evaluation error in %s" % `expr`)
 
         if type == "position":
@@ -2551,7 +2555,7 @@ class AthanaTALEngine:
                 text = f(msgid, language=self.language, request=self.request)
                 if text and text!=msgid:
                     break
-            except: 
+            except:
                 pass
         def repl(m, mapping=mapping):
             return ustr(mapping[m.group(m.lastindex).lower()])
@@ -2559,7 +2563,7 @@ class AthanaTALEngine:
 
 
 class Iterator:
-   
+
     def __init__(self, name, seq, engine):
         self.name = name
         self.seq = seq
@@ -2602,7 +2606,7 @@ class Iterator:
 
     def length(self):
         return len(self.seq)
-    
+
 
 VARIABLE = re.compile(r'\$(?:(%s)|\{(%s)\})' % (NAME_RE, NAME_RE))
 
@@ -2631,7 +2635,7 @@ def runTAL(writer, context=None, string=None, file=None, macro=None, language=No
                 mtime = mtime_file
         else:
             program,macros,mtime = None,None,None
-   
+
     if not (program and macros):
         if file and file.endswith("xml") or mode=="xml":
             talparser = TALParser(TALGenerator(AthanaTALEngine()))
@@ -2708,7 +2712,7 @@ def ustr(v):
         try:
             return v.encode("utf-8")
         except:
-            try: 
+            try:
                 return unicode(v, 'utf-8').encode("utf-8")
             except:
                 try:
@@ -2751,7 +2755,7 @@ def getMacroFile(filename):
             f = r(filename)
             if f is not None and os.path.isfile(f):
                 return f
-        except: 
+        except:
             pass
     if os.path.isfile(filename):
         return filename
@@ -2760,12 +2764,11 @@ def getMacroFile(filename):
         return filename2
     raise IOError("No such file: "+filename2)
 
-   
 #l 6823
 def setBase(base):
     global GLOBAL_ROOT_DIR
     GLOBAL_ROOT_DIR = qualify_path(base)
-   
+
 
 #l 6831
 def addMacroResolver(m):
