@@ -132,7 +132,7 @@ class HTMLTALParser(HTMLParser):
         f.close()
         try:
             self.parseString(data)
-        except TALError, e:
+        except TALError as e:
             e.setFile(file)
             raise
 
@@ -195,7 +195,7 @@ class HTMLTALParser(HTMLParser):
         if tag in EMPTY_HTML_TAGS:
             return
         close_to = -1
-        if BLOCK_CLOSING_TAG_MAP.has_key(tag):
+        if tag in BLOCK_CLOSING_TAG_MAP:
             blocks_to_close = BLOCK_CLOSING_TAG_MAP[tag]
             for i in range(len(self.tagstack)):
                 t = self.tagstack[i]
@@ -304,17 +304,17 @@ class HTMLTALParser(HTMLParser):
             if ns and ns != 'unknown':
                 item = (key, value, ns)
             if ns == 'tal':
-                if taldict.has_key(keybase):
+                if keybase in taldict:
                     raise TALError("duplicate TAL attribute " +
                                    `keybase`, self.getpos())
                 taldict[keybase] = value
             elif ns == 'metal':
-                if metaldict.has_key(keybase):
+                if keybase in metaldict:
                     raise METALError("duplicate METAL attribute " +
                                      `keybase`, self.getpos())
                 metaldict[keybase] = value
             elif ns == 'i18n':
-                if i18ndict.has_key(keybase):
+                if keybase in i18ndict:
                     raise I18NError("duplicate i18n attribute " +
                                     `keybase`, self.getpos())
                 i18ndict[keybase] = value
@@ -631,7 +631,7 @@ def parseAttributeReplacements(arg, xml):
         name, expr = m.group(1, 2)
         if not xml:
             name = name.lower()
-        if dict.has_key(name):
+        if name in dict:
             raise TALError("Duplicate attribute name in attributes: " + `part`)
         dict[name] = expr
     return dict
@@ -848,7 +848,7 @@ class TALGenerator:
     def compileExpression(self, expr):
         try:
             return self.expressionCompiler.compile(expr)
-        except self.CompilerError, err:
+        except self.CompilerError as err:
             raise TALError('%s in expression %s' % (err.args[0], `expr`),
                            self.position)
 
@@ -997,7 +997,7 @@ class TALGenerator:
     def emitDefineMacro(self, macroName):
         program = self.popProgram()
         macroName = macroName.strip()
-        if self.macros.has_key(macroName):
+        if macroName in self.macros:
             raise METALError("duplicate macro definition: %s" % `macroName`,
                              self.position)
         if not re.match('%s$' % NAME_RE, macroName):
@@ -1086,7 +1086,7 @@ class TALGenerator:
         newlist = []
         for item in attrlist:
             key = item[0]
-            if repldict.has_key(key):
+            if key in repldict:
                 expr, xlat, msgid = repldict[key]
                 item = item[:2] + ("replace", expr, xlat, msgid)
                 del repldict[key]
@@ -1293,7 +1293,7 @@ class TALGenerator:
                 ce = self.compileExpression(value)
                 repldict[key] = ce, key in i18nattrs, i18nattrs.get(key)
             for key in i18nattrs:
-                if not repldict.has_key(key):
+                if not key in repldict:
                     repldict[key] = None, 1, i18nattrs.get(key)
         else:
             repldict = {}
@@ -1715,7 +1715,7 @@ class TALInterpreter:
         col = self.col + _len(name) + 1
         wrap = self.wrap
         align = col + 1
-        if align >= wrap/2:
+        if align >= wrap//2:
             align = 4  # Avoid a narrow column far to the right
         attrAction = self.dispatch["<attrAction>"]
         try:
@@ -2470,7 +2470,7 @@ class AthanaTALEngine:
             pos=expr.rfind("/")
             _expr = expr[0:pos]
             _f = expr[pos+1:]
-        if self.locals.has_key(_expr):
+        if _expr in self.locals:
             if _f:
                 return getattr(self.locals[_expr],_f)
             else:
