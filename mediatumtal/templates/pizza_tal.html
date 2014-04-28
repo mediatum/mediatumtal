@@ -13,5 +13,6 @@
     <ul>
 	<li tal:repeat="item python:pizza.get_toppings()"><tal:block tal:content="item"></tal:block></li>
 	</ul>
+	Thickness: <tal:block tal:content="python:pizza.attrs['thickness']"></tal:block>
 </body>
 </html>

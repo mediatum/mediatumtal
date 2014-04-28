@@ -7,8 +7,14 @@ from __future__ import division, absolute_import
 import logging
 import os.path
 import sys
-
 from flask import Flask, render_template
+
+path = os.path.dirname(__file__)
+
+from chameleon import PageTemplateLoader
+templates = PageTemplateLoader(os.path.join(path, "templates"))
+pizza_chameleon_template = templates['pizza_tal.html']
+
 # some debugging and profiling stuff
 try:
     from dozer import Dozer, Profiler
@@ -19,7 +25,7 @@ try:
 except:
     DebugToolbarExtension = None
 
-sys.path.append(".")    
+sys.path.append(".")
 
 from mediatumtal.tal import getTAL
 
@@ -36,17 +42,18 @@ app.config['SECRET_KEY'] = 'TODU9H7xmFHiLRpOforS/gREA+suKW+TEDxNnJ/0C'
 
 if Dozer:
     wsgi_app = Profiler(app, profile_path="/tmp")
-else: 
+else:
     wsgi_app = app
 
 
 class Pizza():
+    attrs = {"thickness": 5}
     def get_toppings(self):
         return ["tomatoes", "mushrooms"]
-    
+
     def get_size(self):
         return 13
-    
+
 
 @app.route("/")
 def index():
@@ -56,6 +63,11 @@ def index():
 def talpizza():
     piz = Pizza()
     return getTAL("templates/pizza_tal.html", dict(pizza=piz))
+
+@app.route("/champizza")
+def champizza():
+    piz = Pizza()
+    return pizza_chameleon_template(pizza=piz)
 
 
 @app.route("/jinjapizza")
@@ -84,7 +96,7 @@ if __name__ == "__main__":
             pdb.set_trace()
         logg.info("setting up pdb debugging hook...")
         signal.signal(signal.SIGQUIT, start_pdb)
-     
+
     # adapted from flask.app.App.run()
     from werkzeug.serving import run_simple
     try:
