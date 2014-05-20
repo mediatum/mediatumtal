@@ -6,7 +6,6 @@ Created on 03.07.2013
 '''
 import logging
 
-# logging.basicConfig()
 logg = logging.getLogger("mediatumtal")
 
 GLOBAL_ROOT_DIR = ""
@@ -2444,7 +2443,7 @@ class AthanaTALEngine:
         if type in ("path", "var", "global", "local"):
             return self.evaluatePathOrVar(expr)
         if type == "not":
-            return not self.evaluate(expr)
+            return not self.evaluate("$" + expr + "$")
         if type == "exists":
             return self.locals.has_key(expr) or self.globals.has_key(expr)
         if type == "python":
