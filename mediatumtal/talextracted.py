@@ -1513,7 +1513,7 @@ def interpolate(text, mapping):
     for string in to_replace:
         var = _get_var_regex.findall(string)[0]
         if mapping.has_key(var):
-            subst = ustr(mapping[var])
+            subst = str(mapping[var])
             try:
                 text = text.replace(string, subst)
             except UnicodeError:
@@ -1974,7 +1974,7 @@ class TALInterpreter:
                                               value.mapping)
 
             if not structure:
-                value = cgi.escape(ustr(value))
+                value = cgi.escape(str(value))
 
         i18ndict, srepr = self.i18nStack[-1]
         i18ndict[varname] = value
@@ -2016,7 +2016,7 @@ class TALInterpreter:
         if structure is self.Default:
             self.interpret(block)
             return
-        text = ustr(structure)
+        text = str(structure)
         if not (repldict or self.strictinsert):
             self.stream_write(text)
             return
@@ -2498,9 +2498,7 @@ class AthanaTALEngine:
 
     def evaluateText(self, expr):
         text = self.evaluate(expr)
-        if text is not None and text is not Default:
-            text = ustr(text)
-        return text
+        return unicode(text)
 
     def evaluateStructure(self, expr):
         return self.evaluate(expr)
@@ -2565,7 +2563,7 @@ class AthanaTALEngine:
             except:
                 pass
         def repl(m, mapping=mapping):
-            return ustr(mapping[m.group(m.lastindex).lower()])
+            return str(mapping[m.group(m.lastindex).lower()])
         return VARIABLE.sub(repl, text)
 
 
@@ -2674,6 +2672,21 @@ def processTAL(context=None, string=None, file=None, macro=None, language=None, 
         def getvalue(self):
             return self.string
     wr = STRWriter()
+    runTAL(wr, context, string=string, file=file, macro=macro, language=language, request=request, mode=mode)
+    return wr.getvalue()
+
+def u_processTAL(context=None, string=None, file=None, macro=None, language=None, request=None, mode=None):
+    class UnicodeWriter:
+        def __init__(self):
+            self.string = u""
+        def write(self,text):
+            if isinstance(text, str):
+                text = text.decode("utf8")
+            self.string += text
+        def getvalue(self):
+            return self.string
+        
+    wr = UnicodeWriter()
     runTAL(wr, context, string=string, file=file, macro=macro, language=language, request=request, mode=mode)
     return wr.getvalue()
 
