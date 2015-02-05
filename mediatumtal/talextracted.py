@@ -371,14 +371,9 @@ class XMLParser:
 
     def createParser(self, encoding=None):
         global XMLParseError
-        try:
-            from Products.ParsedXML.Expat import pyexpat
-            XMLParseError = pyexpat.ExpatError
-            return pyexpat.ParserCreate(encoding, ' ')
-        except ImportError:
-            from xml.parsers import expat
-            XMLParseError = expat.ExpatError
-            return expat.ParserCreate(encoding, ' ')
+        from xml.parsers import expat
+        XMLParseError = expat.ExpatError
+        return expat.ParserCreate(encoding, ' ')
 
     def parseFile(self, filename):
         f = open(filename)
@@ -2016,7 +2011,10 @@ class TALInterpreter:
         if structure is self.Default:
             self.interpret(block)
             return
-        text = str(structure)
+        if isinstance(structure, str):
+            text = structure.decode("utf8")
+        else:
+            text = unicode(structure)
         if not (repldict or self.strictinsert):
             self.stream_write(text)
             return
@@ -2039,7 +2037,7 @@ class TALInterpreter:
         gen.enable(0)
         p.parseFragment('<!DOCTYPE foo PUBLIC "foo" "bar"><foo>')
         gen.enable(1)
-        p.parseFragment(text) # Raises an exception if text is invalid
+        p.parseFragment(text.encode("utf8")) # Raises an exception if text is invalid
         gen.enable(0)
         p.parseFragment('</foo>', 1)
         program, macros = gen.getCode()
@@ -2498,7 +2496,11 @@ class AthanaTALEngine:
 
     def evaluateText(self, expr):
         text = self.evaluate(expr)
-        return unicode(text)
+        if text is not None and text is not Default:
+            if isinstance(text, str):
+                return text.decode("utf8")
+            else:
+                return unicode(text)
 
     def evaluateStructure(self, expr):
         return self.evaluate(expr)
@@ -2563,7 +2565,7 @@ class AthanaTALEngine:
             except:
                 pass
         def repl(m, mapping=mapping):
-            return str(mapping[m.group(m.lastindex).lower()])
+            return mapping[m.group(m.lastindex).lower()]
         return VARIABLE.sub(repl, text)
 
 
@@ -2660,7 +2662,7 @@ def runTAL(writer, context=None, string=None, file=None, macro=None, language=No
     engine = AthanaTALEngine(macros, context, language=language, request=request)
     TALInterpreter(program, macros, engine, writer, wrap=0)()
 
-def processTAL(context=None, string=None, file=None, macro=None, language=None, request=None, mode=None):
+def str_processTAL(context=None, string=None, file=None, macro=None, language=None, request=None, mode=None):
     class STRWriter:
         def __init__(self):
             self.string = ""
@@ -2675,7 +2677,7 @@ def processTAL(context=None, string=None, file=None, macro=None, language=None, 
     runTAL(wr, context, string=string, file=file, macro=macro, language=language, request=request, mode=mode)
     return wr.getvalue()
 
-def u_processTAL(context=None, string=None, file=None, macro=None, language=None, request=None, mode=None):
+def processTAL(context=None, string=None, file=None, macro=None, language=None, request=None, mode=None):
     class UnicodeWriter:
         def __init__(self):
             self.string = u""
