@@ -2456,8 +2456,8 @@ class AthanaTALEngine:
             try:
                 return eval(expr, self.globals, self.locals)
             except Exception as e:
-                logg.error("error!", exc_info=1)
-                raise TALESError("evaluation error in %s" % `expr`)
+                logg.error("exception in TAL python evaluation!")
+                raise TALESError("evaluation error in %s" % `expr`, self.position)
 
         if type == "position":
             if self.position:
