@@ -2446,6 +2446,14 @@ class AthanaTALEngine:
             return not self.evaluate("$" + expr + "$")
         if type == "exists":
             return self.locals.has_key(expr) or self.globals.has_key(expr)
+        if type == "request":
+            try:
+                return eval(expr, {}, self.request.params)
+            except NameError:
+                return None
+            except Exception as e:
+                logg.error("error!", exc_info=1)
+                raise TALESError("evaluation error in %s" % `expr`)
         if type == "python":
             try:
                 return eval(expr, self.globals, self.locals)
