@@ -5,7 +5,7 @@ Created on 26.07.2013
 '''
 from __future__ import division, absolute_import
 from mediatumtal import talextracted
-from mediatumtal.talextracted import processTAL, str_processTAL 
+from mediatumtal.talextracted import processTAL, str_processTAL
 from mediatumtal.talextracted import runTAL  # @UnusedImport
 
 
@@ -29,3 +29,8 @@ def add_translator(translator):
 
 def add_macro_resolver(macroresolver):
     talextracted.addMacroResolver(macroresolver)
+
+
+def add_template_globals(**kwargs):
+    """Adds globals from a dict which will be available in all template contexts"""
+    talextracted.template_globals.update(kwargs)

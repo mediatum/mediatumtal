@@ -2621,6 +2621,8 @@ VARIABLE = re.compile(r'\$(?:(%s)|\{(%s)\})' % (NAME_RE, NAME_RE))
 parsed_files = {}
 parsed_strings = {}
 
+template_globals = {}
+
 def runTAL(writer, context=None, string=None, file=None, macro=None, language=None, request=None, mode=None):
 
     if file:
@@ -2688,8 +2690,9 @@ def processTAL(context=None, string=None, file=None, macro=None, language=None, 
             self.string += text
         def getvalue(self):
             return self.string
-        
+
     wr = UnicodeWriter()
+    context.update(template_globals)
     runTAL(wr, context, string=string, file=file, macro=macro, language=language, request=request, mode=mode)
     return wr.getvalue()
 
