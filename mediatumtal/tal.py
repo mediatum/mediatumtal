@@ -16,6 +16,9 @@ def getTAL(page, context, macro=None, language=None, request=None):
     return processTAL(context, file=page, macro=macro, language=language, request=request)
 
 def getTALstr(string, context, macro=None, language=None, mode=None):
+    # processTAL doesn't support unicode template strings, let's encode it first
+    if isinstance(string, unicode):
+        string = string.encode("utf8")
     return processTAL(context, string=string, macro=macro, language=language, mode=mode)
 
 
