@@ -9,6 +9,6 @@ Installation
 
 With `pip` from source:
 
-    pip install git+git://mediatumdev.ub.tum.de/mediatum-tal
+    pip install git+git://github.com/mediatum/mediatumtal
 
 This installs the mediatumtal package.
